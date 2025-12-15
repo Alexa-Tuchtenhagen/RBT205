@@ -1,0 +1,61 @@
+// ===== PIN DEFINITIONS =====
+const int EN = 3;   // Enable (PWM)
+const int IN3 = 5;  // Direction
+const int IN4 = 4;  // Direction
+
+// ===== SPEED VALUES =====
+const int SPEED_100 = 255;
+const int SPEED_75  = 191; // ~75%
+const int SPEED_25  = 64;  // ~25%
+
+void setup() {
+  pinMode(EN, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+}
+
+void loop() {
+
+  // Repeat the sequence 3 times
+  for (int i = 0; i < 3; i++) {
+
+    // Forward 3 sec @ 100%
+    motorForward(SPEED_100);
+    delay(3000);
+
+    // Backward 4 sec @ 100%
+    motorBackward(SPEED_100);
+    delay(4000);
+
+    // Forward 3 sec @ 25%
+    motorForward(SPEED_25);
+    delay(3000);
+
+    // Backward 4 sec @ 75%
+    motorBackward(SPEED_75);
+    delay(4000);
+  }
+
+  // Stop motor and stay idle forever
+  motorStop();
+  while (true);  // Halt
+}
+
+// ===== MOTOR CONTROL FUNCTIONS =====
+void motorForward(int speed) {
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+  analogWrite(EN, speed);
+}
+
+void motorBackward(int speed) {
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+  analogWrite(EN, speed);
+}
+
+void motorStop() {
+  analogWrite(EN, 0);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+}
