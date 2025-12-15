@@ -1,0 +1,63 @@
+// ===== PIN DEFINITIONS =====
+const int trigPin = 9;
+const int echoPin = 10;
+
+const int enablePin = 3;   // PWM
+const int in3Pin = 5;
+const int in4Pin = 4;
+
+// ===== CONTROL PARAMETERS =====
+const int maxPWM = 255;
+const float maxDistance = 40.0; // maximum distance for 100% speed
+
+void setup() {
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+
+  pinMode(enablePin, OUTPUT);
+  pinMode(in3Pin, OUTPUT);
+  pinMode(in4Pin, OUTPUT);
+
+  // Motor direction forward
+  digitalWrite(in3Pin, HIGH);
+  digitalWrite(in4Pin, LOW);
+
+  Serial.begin(9600);
+  Serial.println("Distance (cm)\tMotor PWM");
+}
+
+void loop() {
+  float distance = getDistanceCM();
+  int motorPWM;
+
+  // Direct proportional mapping: 0 → maxDistance
+  motorPWM = distance * maxPWM / maxDistance;
+
+  // Clamp PWM to valid range
+  if (motorPWM > maxPWM) motorPWM = maxPWM;
+  if (motorPWM < 0) motorPWM = 0;
+
+  analogWrite(enablePin, motorPWM);
+
+  Serial.print(distance);
+  Serial.print("\t\t");
+  Serial.println(motorPWM);
+
+  delay(300);
+}
+
+// ===== ULTRASONIC FUNCTION =====
+float getDistanceCM() {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  long duration = pulseIn(echoPin, HIGH, 30000);
+
+  if (duration == 0) return 0;
+
+  return duration * 0.034 / 2;
+}
